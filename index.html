@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#100f16">
+  <meta name="description" content="A tactile colour-matching game. Tune the sliders, trust your eye, and chase a perfect match.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>Chroma — Colour Sliders</title>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand" aria-label="Chroma colour game">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>chroma</span>
+      </div>
+      <div class="top-actions">
+        <button class="icon-button install-button" id="installButton" type="button" hidden aria-label="Install app" title="Install app">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+        </button>
+        <button class="icon-button" id="soundButton" type="button" aria-label="Turn sound off" title="Sound">
+          <svg class="sound-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 10v4h3l4 3V7l-4 3H5Zm11-1a4 4 0 0 1 0 6m2-9a8 8 0 0 1 0 12"/></svg>
+          <svg class="sound-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 10v4h3l4 3V7l-4 3H5Zm11 0 5 5m0-5-5 5"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="score-strip" aria-label="Game statistics">
+      <div><span>ROUND</span><strong><b id="roundCount">1</b> / 10</strong></div>
+      <div><span>SCORE</span><strong id="scoreCount">0</strong></div>
+      <div><span>BEST</span><strong id="bestCount">—</strong></div>
+    </section>
+
+    <section class="game-card">
+      <div class="prompt">
+        <p>Match this colour</p>
+        <div class="streak" id="streakBadge" hidden><span aria-hidden="true">◆</span> <b id="streakCount">2</b> streak</div>
+      </div>
+
+      <div class="colour-stage">
+        <div class="target-wrap">
+          <div class="colour-orb target-orb" id="targetOrb" aria-label="Target colour"></div>
+          <span>TARGET</span>
+        </div>
+        <div class="match-meter" aria-hidden="true">
+          <span id="liveMatch">—</span>
+          <i></i>
+        </div>
+        <div class="target-wrap">
+          <div class="colour-orb guess-orb" id="guessOrb" aria-label="Your colour"></div>
+          <span>YOURS</span>
+        </div>
+      </div>
+
+      <div class="sliders" aria-label="Pigment controls">
+        <label class="slider-row red">
+          <span class="channel"><i>R</i><b>Red</b></span>
+          <input id="redSlider" type="range" min="0" max="100" value="0" aria-label="Red pigment">
+          <output id="redValue" for="redSlider">0</output>
+        </label>
+        <label class="slider-row yellow">
+          <span class="channel"><i>Y</i><b>Yellow</b></span>
+          <input id="yellowSlider" type="range" min="0" max="100" value="0" aria-label="Yellow pigment">
+          <output id="yellowValue" for="yellowSlider">0</output>
+        </label>
+        <label class="slider-row blue">
+          <span class="channel"><i>B</i><b>Blue</b></span>
+          <input id="blueSlider" type="range" min="0" max="100" value="0" aria-label="Blue pigment">
+          <output id="blueValue" for="blueSlider">0</output>
+        </label>
+        <div class="value-divider"><span>VALUE</span></div>
+        <label class="slider-row white">
+          <span class="channel"><i>W</i><b>White</b></span>
+          <input id="whiteSlider" type="range" min="0" max="100" value="0" aria-label="White paint">
+          <output id="whiteValue" for="whiteSlider">0</output>
+        </label>
+        <label class="slider-row black">
+          <span class="channel"><i>K</i><b>Black</b></span>
+          <input id="blackSlider" type="range" min="0" max="100" value="0" aria-label="Black paint">
+          <output id="blackValue" for="blackSlider">0</output>
+        </label>
+      </div>
+
+      <button class="check-button" id="checkButton" type="button">
+        <span>Lock in colour</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </section>
+
+    <p class="hint"><span aria-hidden="true">✦</span> Mix RYB pigments, then tune the value</p>
+  </main>
+
+  <dialog class="result-dialog" id="resultDialog">
+    <div class="result-glow" id="resultGlow"></div>
+    <div class="result-content">
+      <span class="eyebrow" id="resultEyebrow">ROUND COMPLETE</span>
+      <strong class="result-score"><b id="resultScore">94</b><small>%</small></strong>
+      <h2 id="resultTitle">Beautiful match</h2>
+      <p id="resultCopy">That was seriously close. Your eye for colour is warming up.</p>
+      <div class="comparison">
+        <div><i id="resultTarget"></i><span>Target</span><code id="targetHex">#000000</code></div>
+        <div><i id="resultGuess"></i><span>Yours</span><code id="guessHex">#000000</code></div>
+      </div>
+      <button class="check-button" id="nextButton" type="button"><span>Next round</span><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+    </div>
+  </dialog>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

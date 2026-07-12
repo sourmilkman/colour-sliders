@@ -1,0 +1,19 @@
+{
+  "name": "Chroma — Colour Sliders",
+  "short_name": "Chroma",
+  "description": "Mix RYB pigments with white and black to match the target colour and test your eye.",
+  "id": "/colour-sliders/",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "portrait",
+  "background_color": "#100f16",
+  "theme_color": "#100f16",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
