@@ -59,21 +59,32 @@
         </div>
       </div>
 
-      <div class="sliders" aria-label="Colour controls">
+      <div class="sliders" aria-label="Pigment controls">
         <label class="slider-row red">
           <span class="channel"><i>R</i><b>Red</b></span>
-          <input id="redSlider" type="range" min="0" max="255" value="128" aria-label="Red value">
-          <output id="redValue" for="redSlider">128</output>
+          <input id="redSlider" type="range" min="0" max="100" value="0" aria-label="Red pigment">
+          <output id="redValue" for="redSlider">0</output>
         </label>
-        <label class="slider-row green">
-          <span class="channel"><i>G</i><b>Green</b></span>
-          <input id="greenSlider" type="range" min="0" max="255" value="128" aria-label="Green value">
-          <output id="greenValue" for="greenSlider">128</output>
+        <label class="slider-row yellow">
+          <span class="channel"><i>Y</i><b>Yellow</b></span>
+          <input id="yellowSlider" type="range" min="0" max="100" value="0" aria-label="Yellow pigment">
+          <output id="yellowValue" for="yellowSlider">0</output>
         </label>
         <label class="slider-row blue">
           <span class="channel"><i>B</i><b>Blue</b></span>
-          <input id="blueSlider" type="range" min="0" max="255" value="128" aria-label="Blue value">
-          <output id="blueValue" for="blueSlider">128</output>
+          <input id="blueSlider" type="range" min="0" max="100" value="0" aria-label="Blue pigment">
+          <output id="blueValue" for="blueSlider">0</output>
+        </label>
+        <div class="value-divider"><span>VALUE</span></div>
+        <label class="slider-row white">
+          <span class="channel"><i>W</i><b>White</b></span>
+          <input id="whiteSlider" type="range" min="0" max="100" value="0" aria-label="White paint">
+          <output id="whiteValue" for="whiteSlider">0</output>
+        </label>
+        <label class="slider-row black">
+          <span class="channel"><i>K</i><b>Black</b></span>
+          <input id="blackSlider" type="range" min="0" max="100" value="0" aria-label="Black paint">
+          <output id="blackValue" for="blackSlider">0</output>
         </label>
       </div>
 
@@ -83,7 +94,7 @@
       </button>
     </section>
 
-    <p class="hint"><span aria-hidden="true">✦</span> Get within 90% to build a streak</p>
+    <p class="hint"><span aria-hidden="true">✦</span> Mix RYB pigments, then tune the value</p>
   </main>
 
   <dialog class="result-dialog" id="resultDialog">

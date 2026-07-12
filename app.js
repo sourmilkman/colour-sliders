@@ -1,6 +1,6 @@
 const $ = (selector) => document.querySelector(selector);
-const sliders = [$('#redSlider'), $('#greenSlider'), $('#blueSlider')];
-const outputs = [$('#redValue'), $('#greenValue'), $('#blueValue')];
+const sliders = [$('#redSlider'), $('#yellowSlider'), $('#blueSlider'), $('#whiteSlider'), $('#blackSlider')];
+const outputs = [$('#redValue'), $('#yellowValue'), $('#blueValue'), $('#whiteValue'), $('#blackValue')];
 const targetOrb = $('#targetOrb');
 const guessOrb = $('#guessOrb');
 const liveMatch = $('#liveMatch');
@@ -20,7 +20,37 @@ let installPrompt;
 
 function rgb(values) { return `rgb(${values.join(', ')})`; }
 function hex(values) { return `#${values.map((v) => v.toString(16).padStart(2, '0')).join('').toUpperCase()}`; }
-function guess() { return sliders.map((slider) => Number(slider.value)); }
+function cubic(t, a, b) {
+  const weight = t * t * (3 - 2 * t);
+  return a + weight * (b - a);
+}
+
+// Artist-friendly RYB interpolation based on the traditional paint colour cube.
+function rybToRgb([red, yellow, blue, white, black]) {
+  const r = red / 100;
+  const y = yellow / 100;
+  const b = blue / 100;
+
+  const channel = (corners) => {
+    const pale = cubic(b, corners[0], corners[1]);
+    const yellowed = cubic(b, corners[2], corners[3]);
+    const red = cubic(b, corners[4], corners[5]);
+    const dark = cubic(b, corners[6], corners[7]);
+    return cubic(r, cubic(y, pale, yellowed), cubic(y, red, dark));
+  };
+  const rgb = [
+    channel([1, .163, 1, 0, 1, .5, 1, .2]),
+    channel([1, .373, 1, .66, 0, .094, .5, .2]),
+    channel([1, .6, 0, .2, 0, .5, 0, 0]),
+  ];
+
+  const tint = white / 100;
+  const shade = black / 100;
+  return rgb.map((channel) => Math.round(cubic(shade, cubic(tint, channel, 1), 0) * 255));
+}
+
+function pigmentMix() { return sliders.map((slider) => Number(slider.value)); }
+function guess() { return rybToRgb(pigmentMix()); }
 
 function similarity(a, b) {
   const distance = Math.sqrt(a.reduce((sum, value, index) => sum + (value - b[index]) ** 2, 0));
@@ -32,18 +62,26 @@ function updateGuess() {
   guessOrb.style.backgroundColor = rgb(values);
   sliders.forEach((slider, index) => {
     outputs[index].value = slider.value;
-    slider.style.setProperty('--fill', `${(slider.value / 255) * 100}%`);
+    slider.style.setProperty('--fill', `${slider.value}%`);
   });
   const match = similarity(state.target, values);
   liveMatch.textContent = state.round ? `${match}%` : '—';
 }
 
 function generateTarget() {
-  // Avoid targets that are nearly white/black or visually muddy.
+  // Generate targets from the same paint model so every colour is achievable.
+  let recipe;
   let candidate;
   do {
-    candidate = Array.from({ length: 3 }, () => 24 + Math.floor(Math.random() * 208));
-  } while (Math.max(...candidate) - Math.min(...candidate) < 42);
+    recipe = [
+      Math.floor(Math.random() * 101),
+      Math.floor(Math.random() * 101),
+      Math.floor(Math.random() * 101),
+      Math.floor(Math.random() * 36),
+      Math.floor(Math.random() * 36),
+    ];
+    candidate = rybToRgb(recipe);
+  } while (Math.max(...candidate) - Math.min(...candidate) < 28 || Math.max(...candidate) < 48);
   state.target = candidate;
   targetOrb.style.backgroundColor = rgb(candidate);
 }
@@ -116,7 +154,7 @@ function nextRound() {
   $('#streakBadge').hidden = state.streak < 2;
   $('#streakCount').textContent = state.streak;
   generateTarget();
-  sliders.forEach((slider) => { slider.value = 128; });
+    sliders.forEach((slider) => { slider.value = 0; });
   updateGuess();
 }
 
