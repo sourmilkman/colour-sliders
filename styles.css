@@ -129,13 +129,6 @@ input[type="range"]::-moz-range-thumb { width: 13px; height: 13px; border: 5px s
 .settings-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .settings-heading h2 { margin: 4px 0 0; font-size: 23px; letter-spacing: -.6px; }
 .settings-heading .icon-button { font-size: 24px; line-height: 1; }
-.settings-dialog fieldset { margin: 0 0 22px; padding: 0; border: 0; }
-.settings-dialog legend { margin-bottom: 9px; color: var(--muted); font-size: 11px; font-weight: 760; letter-spacing: 1px; text-transform: uppercase; }
-.model-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; padding: 5px; border: 1px solid #302d37; border-radius: 16px; background: #14131a; }
-.model-options label { cursor: pointer; }
-.model-options input { position: absolute; opacity: 0; pointer-events: none; }
-.model-options span { min-height: 42px; display: grid; place-items: center; border-radius: 12px; color: var(--muted); font-size: 12px; font-weight: 800; }
-.model-options input:checked + span { color: #12150a; background: var(--accent); }
 .setting-toggle { display: flex; align-items: center; justify-content: space-between; gap: 20px; cursor: pointer; }
 .setting-toggle > span { display: grid; gap: 4px; }
 .setting-toggle b { font-size: 14px; }

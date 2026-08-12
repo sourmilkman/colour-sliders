@@ -62,7 +62,34 @@
         </div>
       </div>
 
-      <div class="sliders" id="modelSliders" aria-label="Colour controls"></div>
+      <div class="sliders" id="modelSliders" aria-label="RYB pigment controls">
+        <label class="slider-row red">
+          <span class="channel"><i>R</i><b>Red</b></span>
+          <input id="redSlider" type="range" min="0" max="100" value="0" aria-label="Red pigment">
+          <output id="redValue" for="redSlider">0</output>
+        </label>
+        <label class="slider-row yellow">
+          <span class="channel"><i>Y</i><b>Yellow</b></span>
+          <input id="yellowSlider" type="range" min="0" max="100" value="0" aria-label="Yellow pigment">
+          <output id="yellowValue" for="yellowSlider">0</output>
+        </label>
+        <label class="slider-row blue">
+          <span class="channel"><i>B</i><b>Blue</b></span>
+          <input id="blueSlider" type="range" min="0" max="100" value="0" aria-label="Blue pigment">
+          <output id="blueValue" for="blueSlider">0</output>
+        </label>
+        <div class="value-divider"><span>VALUE</span></div>
+        <label class="slider-row white">
+          <span class="channel"><i>W</i><b>White</b></span>
+          <input id="whiteSlider" type="range" min="0" max="100" value="0" aria-label="White paint">
+          <output id="whiteValue" for="whiteSlider">0</output>
+        </label>
+        <label class="slider-row black">
+          <span class="channel"><i>K</i><b>Black</b></span>
+          <input id="blackSlider" type="range" min="0" max="100" value="0" aria-label="Black paint">
+          <output id="blackValue" for="blackSlider">0</output>
+        </label>
+      </div>
 
       <button class="check-button" id="checkButton" type="button">
         <span>Lock in colour</span>
@@ -70,7 +97,7 @@
       </button>
     </section>
 
-    <p class="hint"><span aria-hidden="true">✦</span> <span id="modelHint">Tune HSV to match the target</span> · Build 003</p>
+    <p class="hint"><span aria-hidden="true">✦</span> Mix RYB pigments, then tune the value · Build 004</p>
   </main>
 
   <dialog class="result-dialog" id="resultDialog">
@@ -95,14 +122,6 @@
         <div><span class="eyebrow">SETTINGS</span><h2>How you play</h2></div>
         <button class="icon-button" value="close" aria-label="Close settings" type="submit">×</button>
       </div>
-      <fieldset>
-        <legend>Colour model</legend>
-        <div class="model-options">
-          <label><input type="radio" name="colourModel" value="hsv"><span>HSV</span></label>
-          <label><input type="radio" name="colourModel" value="rgb"><span>RGB</span></label>
-          <label><input type="radio" name="colourModel" value="cmyk"><span>CMYK</span></label>
-        </div>
-      </fieldset>
       <label class="setting-toggle">
         <span><b>Easy mode</b><small>Show the live match percentage</small></span>
         <input id="easyModeToggle" type="checkbox" role="switch">
