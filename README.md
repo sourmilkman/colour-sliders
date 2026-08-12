@@ -14,6 +14,6 @@ Open the printed local URL. Service workers and PWA installation require HTTP(S)
 
 ## Gameplay
 
-Choose HSV, RGB, or CMYK controls and recreate the target colour. Easy mode can optionally reveal a live match percentage between the swatches; it is off by default.
+Use the red, yellow, and blue pigment sliders to recreate the target colour, then tune it with the white and black sliders. Easy mode can optionally reveal a live match percentage between the swatches; it is off by default.
 
 Lock in your guess to score the round as a percentage, where 100% is an exact match. A game lasts ten rounds and the total score is the average round percentage, saved locally when it beats your best.

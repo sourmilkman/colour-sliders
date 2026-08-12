@@ -4,33 +4,14 @@ const guessOrb = $('#guessOrb');
 const liveMatch = $('#liveMatch');
 const resultDialog = $('#resultDialog');
 const settingsDialog = $('#settingsDialog');
-
-const MODELS = {
-  hsv: [
-    { key: 'h', label: 'Hue', short: 'H', max: 360, value: 0, color: '#ff6b8a' },
-    { key: 's', label: 'Saturation', short: 'S', max: 100, value: 0, color: '#b68cff' },
-    { key: 'v', label: 'Value', short: 'V', max: 100, value: 100, color: '#f6f1e8' },
-  ],
-  rgb: [
-    { key: 'r', label: 'Red', short: 'R', max: 255, value: 0, color: '#ff5c72' },
-    { key: 'g', label: 'Green', short: 'G', max: 255, value: 0, color: '#65dc91' },
-    { key: 'b', label: 'Blue', short: 'B', max: 255, value: 0, color: '#6f8cff' },
-  ],
-  cmyk: [
-    { key: 'c', label: 'Cyan', short: 'C', max: 100, value: 0, color: '#49d9e8' },
-    { key: 'm', label: 'Magenta', short: 'M', max: 100, value: 0, color: '#f45bb4' },
-    { key: 'y', label: 'Yellow', short: 'Y', max: 100, value: 0, color: '#ffd84d' },
-    { key: 'k', label: 'Black', short: 'K', max: 100, value: 0, color: '#77727f' },
-  ],
-};
+const sliders = [$('#redSlider'), $('#yellowSlider'), $('#blueSlider'), $('#whiteSlider'), $('#blackSlider')];
+const outputs = [$('#redValue'), $('#yellowValue'), $('#blueValue'), $('#whiteValue'), $('#blackValue')];
 
 const state = {
   round: 1,
   scores: [],
   streak: 0,
   target: [0, 0, 0],
-  values: {},
-  model: localStorage.getItem('chroma-model') || 'hsv',
   easyMode: localStorage.getItem('chroma-easy-mode') === 'true',
   muted: localStorage.getItem('chroma-muted') === 'true',
   best: Number(localStorage.getItem('chroma-best-average')) || 0,
@@ -43,31 +24,33 @@ function rgb(values) { return `rgb(${values.join(', ')})`; }
 function hex(values) { return `#${values.map((value) => value.toString(16).padStart(2, '0')).join('').toUpperCase()}`; }
 function average() { return state.scores.length ? Math.round(state.scores.reduce((sum, value) => sum + value, 0) / state.scores.length) : 0; }
 
-function hsvToRgb([h, s, v]) {
-  const saturation = s / 100;
-  const value = v / 100;
-  const chroma = value * saturation;
-  const section = (h % 360) / 60;
-  const x = chroma * (1 - Math.abs((section % 2) - 1));
-  const channels = section < 1 ? [chroma, x, 0]
-    : section < 2 ? [x, chroma, 0]
-      : section < 3 ? [0, chroma, x]
-        : section < 4 ? [0, x, chroma]
-          : section < 5 ? [x, 0, chroma] : [chroma, 0, x];
-  const offset = value - chroma;
-  return channels.map((channel) => Math.round((channel + offset) * 255));
+function cubic(t, a, b) {
+  const weight = t * t * (3 - 2 * t);
+  return a + weight * (b - a);
 }
 
-function cmykToRgb([c, m, y, k]) {
-  return [c, m, y].map((channel) => Math.round(255 * (1 - channel / 100) * (1 - k / 100)));
+function rybToRgb([red, yellow, blue, white, black]) {
+  const r = red / 100;
+  const y = yellow / 100;
+  const b = blue / 100;
+  const channel = (corners) => {
+    const pale = cubic(b, corners[0], corners[1]);
+    const yellowed = cubic(b, corners[2], corners[3]);
+    const reddened = cubic(b, corners[4], corners[5]);
+    const dark = cubic(b, corners[6], corners[7]);
+    return cubic(r, cubic(y, pale, yellowed), cubic(y, reddened, dark));
+  };
+  const mixed = [
+    channel([1, .163, 1, 0, 1, .5, 1, .2]),
+    channel([1, .373, 1, .66, 0, .094, .5, .2]),
+    channel([1, .6, 0, .2, 0, .5, 0, 0]),
+  ];
+  const tint = white / 100;
+  const shade = black / 100;
+  return mixed.map((value) => Math.round(cubic(shade, cubic(tint, value, 1), 0) * 255));
 }
 
-function guess() {
-  const values = MODELS[state.model].map(({ key }) => state.values[key]);
-  if (state.model === 'hsv') return hsvToRgb(values);
-  if (state.model === 'cmyk') return cmykToRgb(values);
-  return values;
-}
+function guess() { return rybToRgb(sliders.map((slider) => Number(slider.value))); }
 
 function rgbToLab(values) {
   const linear = values.map((value) => {
@@ -90,26 +73,14 @@ function accuracy(a, b) {
 }
 
 function renderSliders() {
-  state.values = {};
-  $('#modelSliders').innerHTML = MODELS[state.model].map((control) => {
-    state.values[control.key] = control.value;
-    return `<label class="slider-row" style="--channel:${control.color}">
-      <span class="channel"><i>${control.short}</i><b>${control.label}</b></span>
-      <input data-key="${control.key}" type="range" min="0" max="${control.max}" value="${control.value}" aria-label="${control.label}">
-      <output>${control.value}</output>
-    </label>`;
-  }).join('');
-  $('#modelSliders').querySelectorAll('input').forEach((slider) => slider.addEventListener('input', updateGuess));
-  $('#modelHint').textContent = `Tune ${state.model.toUpperCase()} to match the target`;
+  sliders.forEach((slider) => { slider.value = 0; });
   updateGuess();
 }
 
-function updateGuess(event) {
-  if (event) state.values[event.target.dataset.key] = Number(event.target.value);
-  $('#modelSliders').querySelectorAll('input').forEach((slider) => {
-    const output = slider.parentElement.querySelector('output');
-    output.value = slider.value;
-    slider.style.setProperty('--fill', `${Number(slider.value) / Number(slider.max) * 100}%`);
+function updateGuess() {
+  sliders.forEach((slider, index) => {
+    outputs[index].value = slider.value;
+    slider.style.setProperty('--fill', `${slider.value}%`);
   });
   const values = guess();
   guessOrb.style.backgroundColor = rgb(values);
@@ -117,10 +88,19 @@ function updateGuess(event) {
 }
 
 function generateTarget() {
-  const hue = Math.floor(Math.random() * 360);
-  const saturation = 32 + Math.floor(Math.random() * 64);
-  const value = 38 + Math.floor(Math.random() * 59);
-  state.target = hsvToRgb([hue, saturation, value]);
+  let recipe;
+  let candidate;
+  do {
+    recipe = [
+      Math.floor(Math.random() * 101),
+      Math.floor(Math.random() * 101),
+      Math.floor(Math.random() * 101),
+      Math.floor(Math.random() * 36),
+      Math.floor(Math.random() * 36),
+    ];
+    candidate = rybToRgb(recipe);
+  } while (Math.max(...candidate) - Math.min(...candidate) < 28 || Math.max(...candidate) < 48);
+  state.target = candidate;
   targetOrb.style.backgroundColor = rgb(state.target);
 }
 
@@ -129,6 +109,7 @@ function setEasyMode(enabled) {
   localStorage.setItem('chroma-easy-mode', String(enabled));
   $('#easyModeToggle').checked = enabled;
   $('#matchMeter').classList.toggle('easy-mode', enabled);
+  $('#matchMeter').setAttribute('aria-hidden', String(!enabled));
 }
 
 function tone(frequency, duration = .09) {
@@ -205,11 +186,7 @@ $('#checkButton').addEventListener('click', showResult);
 $('#nextButton').addEventListener('click', nextRound);
 $('#settingsButton').addEventListener('click', () => settingsDialog.showModal());
 $('#easyModeToggle').addEventListener('change', (event) => setEasyMode(event.target.checked));
-document.querySelectorAll('[name="colourModel"]').forEach((input) => input.addEventListener('change', (event) => {
-  state.model = event.target.value;
-  localStorage.setItem('chroma-model', state.model);
-  renderSliders();
-}));
+sliders.forEach((slider) => slider.addEventListener('input', updateGuess));
 $('#soundButton').addEventListener('click', () => {
   state.muted = !state.muted;
   localStorage.setItem('chroma-muted', state.muted);
@@ -232,8 +209,6 @@ $('#installButton').addEventListener('click', async () => {
 });
 window.addEventListener('appinstalled', () => { $('#installButton').hidden = true; });
 
-if (!MODELS[state.model]) state.model = 'hsv';
-$(`[name="colourModel"][value="${state.model}"]`).checked = true;
 $('#soundButton').classList.toggle('muted', state.muted);
 $('#bestCount').textContent = state.best ? `${state.best}%` : '—';
 setEasyMode(state.easyMode);
