@@ -76,6 +76,8 @@ button { color: inherit; }
 .guess-orb { position: relative; }
 .guess-orb::after { content: ""; position: absolute; inset: 9px; border: 1px solid rgba(255,255,255,.16); border-radius: 31%; }
 .match-meter { display: grid; place-items: center; gap: 7px; color: #a6a1ac; font-size: 11px; font-weight: 750; }
+.match-meter span { visibility: hidden; }
+.match-meter.easy-mode span { visibility: visible; color: var(--accent); }
 .match-meter i { width: 32px; height: 1px; background: #3a3642; position: relative; }
 .match-meter i::before, .match-meter i::after { content: ""; position: absolute; width: 4px; height: 4px; top: -2px; border-radius: 50%; background: #65606c; }
 .match-meter i::before { left: 0; }.match-meter i::after { right: 0; }
@@ -110,6 +112,8 @@ input[type="range"]::-moz-range-thumb { width: 13px; height: 13px; border: 5px s
 .eyebrow { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 1.7px; }
 .result-score { display: block; margin: 10px 0 0; font-size: 73px; line-height: 1; letter-spacing: -6px; }
 .result-score small { color: var(--accent); font-size: 25px; letter-spacing: -2px; }
+.result-average { margin-top: 8px !important; color: var(--muted) !important; }
+.result-average b { color: var(--text); }
 .result-content h2 { margin: 8px 0 7px; font-size: 23px; letter-spacing: -.6px; }
 .result-content > p { max-width: 310px; margin: 0 auto; color: #99949f; font-size: 13px; line-height: 1.5; }
 .comparison { margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
@@ -118,6 +122,28 @@ input[type="range"]::-moz-range-thumb { width: 13px; height: 13px; border: 5px s
 .comparison span { align-self: end; color: #b5b0ba; font-size: 10px; }
 .comparison code { color: #716c78; font-size: 9px; }
 .result-dialog .check-button { margin-top: 18px; }
+
+.settings-dialog { width: min(calc(100% - 32px), 430px); padding: 0; border: 1px solid #36313f; border-radius: 28px; color: var(--text); background: #1a1821; box-shadow: 0 30px 90px rgba(0,0,0,.65); }
+.settings-dialog::backdrop { background: rgba(5,4,8,.72); backdrop-filter: blur(9px); }
+.settings-dialog form { padding: 24px; }
+.settings-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.settings-heading h2 { margin: 4px 0 0; font-size: 23px; letter-spacing: -.6px; }
+.settings-heading .icon-button { font-size: 24px; line-height: 1; }
+.settings-dialog fieldset { margin: 0 0 22px; padding: 0; border: 0; }
+.settings-dialog legend { margin-bottom: 9px; color: var(--muted); font-size: 11px; font-weight: 760; letter-spacing: 1px; text-transform: uppercase; }
+.model-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; padding: 5px; border: 1px solid #302d37; border-radius: 16px; background: #14131a; }
+.model-options label { cursor: pointer; }
+.model-options input { position: absolute; opacity: 0; pointer-events: none; }
+.model-options span { min-height: 42px; display: grid; place-items: center; border-radius: 12px; color: var(--muted); font-size: 12px; font-weight: 800; }
+.model-options input:checked + span { color: #12150a; background: var(--accent); }
+.setting-toggle { display: flex; align-items: center; justify-content: space-between; gap: 20px; cursor: pointer; }
+.setting-toggle > span { display: grid; gap: 4px; }
+.setting-toggle b { font-size: 14px; }
+.setting-toggle small { color: var(--muted); font-size: 11px; }
+.setting-toggle input { appearance: none; width: 48px; height: 28px; flex: 0 0 auto; padding: 3px; border: 1px solid #3a3642; border-radius: 99px; background: #292631; cursor: pointer; transition: background .2s ease; }
+.setting-toggle input::before { content: ""; display: block; width: 20px; height: 20px; border-radius: 50%; background: #8f8996; transition: transform .2s ease, background .2s ease; }
+.setting-toggle input:checked { background: rgba(217,255,104,.22); border-color: rgba(217,255,104,.45); }
+.setting-toggle input:checked::before { transform: translateX(20px); background: var(--accent); }
 
 @keyframes breathe { 50% { transform: scale(1.025); } }
 @media (max-height: 760px) {
