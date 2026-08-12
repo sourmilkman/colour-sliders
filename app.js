@@ -52,24 +52,10 @@ function rybToRgb([red, yellow, blue, white, black]) {
 
 function guess() { return rybToRgb(sliders.map((slider) => Number(slider.value))); }
 
-function rgbToLab(values) {
-  const linear = values.map((value) => {
-    const channel = value / 255;
-    return channel <= .04045 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4;
-  });
-  const x = (linear[0] * .4124 + linear[1] * .3576 + linear[2] * .1805) / .95047;
-  const y = linear[0] * .2126 + linear[1] * .7152 + linear[2] * .0722;
-  const z = (linear[0] * .0193 + linear[1] * .1192 + linear[2] * .9505) / 1.08883;
-  const curve = (value) => value > .008856 ? Math.cbrt(value) : (7.787 * value) + (16 / 116);
-  const [fx, fy, fz] = [x, y, z].map(curve);
-  return [(116 * fy) - 16, 500 * (fx - fy), 200 * (fy - fz)];
-}
-
 function accuracy(a, b) {
-  const labA = rgbToLab(a);
-  const labB = rgbToLab(b);
-  const deltaE = Math.sqrt(labA.reduce((sum, value, index) => sum + (value - labB[index]) ** 2, 0));
-  return Math.max(0, Math.min(100, Math.round(100 - deltaE * 10)));
+  const distance = Math.sqrt(a.reduce((sum, value, index) => sum + (value - b[index]) ** 2, 0));
+  const maximumDistance = Math.sqrt(3 * 255 ** 2);
+  return Math.max(0, Math.min(100, Math.round((1 - distance / maximumDistance) * 100)));
 }
 
 function renderSliders() {
@@ -186,7 +172,10 @@ $('#checkButton').addEventListener('click', showResult);
 $('#nextButton').addEventListener('click', nextRound);
 $('#settingsButton').addEventListener('click', () => settingsDialog.showModal());
 $('#easyModeToggle').addEventListener('change', (event) => setEasyMode(event.target.checked));
-sliders.forEach((slider) => slider.addEventListener('input', updateGuess));
+sliders.forEach((slider) => {
+  slider.addEventListener('input', updateGuess);
+  slider.addEventListener('change', updateGuess);
+});
 $('#soundButton').addEventListener('click', () => {
   state.muted = !state.muted;
   localStorage.setItem('chroma-muted', state.muted);
